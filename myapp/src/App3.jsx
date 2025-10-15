@@ -1,12 +1,12 @@
+import Counter3 from './Counter3';
 import './App.css';
-import Counter4 from './Counter4';
+
 
 function App() {
-  
   return (
     <>
-      <Counter4 />
+      <Counter3 />
     </>
-  );
+  )
 }
 export default App
