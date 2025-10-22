@@ -3,6 +3,8 @@ import { Car } from "../types";
 import { useState } from "react";
 import  { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addCar } from "../api/carapi";
+import CarDialogContent from "./CarDialogContent";
+
 
 function AddCar() {
   const [open, setOpen] = useState(false);
@@ -50,16 +52,9 @@ function AddCar() {
   return (
     <>
       <button onClick={handleClickOpen}>New Car</button>
-      <Dialog open={open}>
+      <Dialog open={open} onClose={handleClickClose}>
         <DialogTitle>Add New Car</DialogTitle>
-        <DialogContent>
-          <input type="text" name="brand" placeholder="Brand" value={car.brand} onChange={handleChange} /><br />
-          <input type="text" name="model" placeholder="Model" value={car.model} onChange={handleChange} /><br />
-          <input type="text" name="color" placeholder="Color" value={car.color} onChange={handleChange} /><br />
-          <input type="text" name="registrationNumber" placeholder="Registration Number" value={car.registrationNumber} onChange={handleChange} /><br />
-          <input type="number" name="modelYear" placeholder="Model Year" value={car.modelYear} onChange={handleChange} /><br />
-          <input type="number" name="price" placeholder="Price" value={car.price} onChange={handleChange} /><br />
-`        </DialogContent>
+        <CarDialogContent car={car} handleChange={handleChange} />
         <DialogActions>
           <button onClick={handleSave}>Save | 저장</button>
           <button onClick={handleClickClose}>Cancel | 취소</button>
