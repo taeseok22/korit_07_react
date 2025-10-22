@@ -6,7 +6,9 @@ import { Snackbar, IconButton } from "@mui/material";
 import { useState } from "react";
 import AddCar from "./AddCar";
 import EditCar from "./EditCar";
+
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
+
 
 function Carlist() {
   const [open, setOpen] = useState(false);
@@ -41,9 +43,9 @@ function Carlist() {
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      renderCell: (params: GridCellParams) =>
+      renderCell: (params: GridCellParams) => (
         <EditCar cardata={params.row}/>
-      
+      )
     },
     {
       field: 'delete',
@@ -57,6 +59,7 @@ function Carlist() {
         onClick={() => {
           if (window.confirm(`${params.row.brand}의 ${params.row.model} 자동차를 삭제하시겠습니까?`)) {
           mutate(params.row._links.self.href)}}
+          
         }
           >
           <DeleteForeverRoundedIcon fontSize="small"/>
