@@ -1,6 +1,7 @@
-import { Button, TextField, Stack } from "@mui/material";
+import { Button, TextField, Stack, Snackbar } from "@mui/material";
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
+import Carlist from "./Carlist";
 
 
 type User = {
@@ -14,6 +15,7 @@ function Login() {
   });
 
   const [ isAuthenticated, setAuth] = useState(false);
+  const [ open, setOpen ] = useState(false);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUser({...user, [event.target.name]: event.target.value});
@@ -40,29 +42,41 @@ function Login() {
     //     'Content-Type': 'application/json',}
     //   })
   }
+  if(isAuthenticated) {
+    return <Carlist />
+  }
 
-  return (
-    <Stack spacing={2} alignItems={"center"} mt={2}>
-      <TextField
-        name="username"
-        label="Username"
-        onChange={handleChange}
-      />
-      <TextField
-        name="password"
-        label="Password"
-        type="password"
-        onChange={handleChange}
-      />
-      <Button
-      variant="contained"
-      color="primary"
-      onClick={handleLogin}
-      >
-        Login
-      </Button>
-    </Stack>
-  )
+  else {
+    return (
+      <Stack spacing={2} alignItems={"center"} mt={5}>
+        <TextField
+          name="username"
+          label="Username"
+          onChange={handleChange}
+        />
+        <TextField
+          name="password"
+          label="Password"
+          type="password"
+          onChange={handleChange}
+        />
+        <Button
+        variant="contained"
+        color="primary"
+        onClick={handleLogin}
+        >
+          Login
+        </Button>
+        <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={() => setOpen(false)}
+        message="ID 혹은 비밀번호가 틀렸습니다."
+        />
+      </Stack>
+    )
+  }
+
 }
 
 export default Login;
