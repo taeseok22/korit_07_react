@@ -1,7 +1,33 @@
 import { useState, useEffect } from 'react';
-import { fetchItems, createItem, updateItem, deleteItem, Item } from './App';
+import axios from 'axios';
 import './App.css';
 
+const BASE_URL = 'http://localhost:8080/api/items';
+
+export interface Item {
+  id: number;
+  name: string;
+  quantity: number;
+}
+
+export async function fetchItems(): Promise<Item[]> {
+  const res = await axios.get(BASE_URL);
+  return res.data;
+}
+
+export async function createItem(item: Omit<Item, 'id'>): Promise<Item> {
+  const res = await axios.post(BASE_URL, item);
+  return res.data;
+}
+
+export async function updateItem(id: number, item: Omit<Item, 'id'>): Promise<Item> {
+  const res = await axios.put(`${BASE_URL}/${id}`, item);
+  return res.data;
+}
+
+export async function deleteItem(id: number): Promise<void> {
+  await axios.delete(`${BASE_URL}/${id}`);
+}
 
 function App() {
   const [items, setItems] = useState<Item[]>([]);
@@ -11,6 +37,8 @@ function App() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
   const [editingQuantity, setEditingQuantity] = useState(1);
+
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   useEffect(() => {
     fetchItems().then(setItems);
@@ -27,6 +55,7 @@ function App() {
   const handleDelete = async (id: number) => {
     await deleteItem(id);
     setItems(items.filter(item => item.id !== id));
+    setSelectedItems(selectedItems.filter(sid => sid !== id));
   };
 
   const startEditing = (item: Item) => {
@@ -48,10 +77,27 @@ function App() {
     setEditingQuantity(1);
   };
 
+  const toggleSelect = (id: number) => {
+    if (selectedItems.includes(id)) {
+      setSelectedItems(selectedItems.filter(itemId => itemId !== id));
+    } else {
+      setSelectedItems([...selectedItems, id]);
+    }
+  };
+
+  const deleteSelected = async () => {
+    for (let id of selectedItems) {
+      await deleteItem(id);
+    }
+    setItems(items.filter(item => !selectedItems.includes(item.id)));
+    setSelectedItems([]);
+  };
+
   return (
     <div className="app-container">
       <h1>Todo List</h1>
-        <p>할 일들을 작성해보셈</p>
+      <p>할 일들을 작성해보세요</p>
+
       <input
         placeholder="Item name"
         value={newName}
@@ -65,9 +111,20 @@ function App() {
       />
       <button onClick={handleAdd}>추가</button>
 
+      {selectedItems.length > 0 && (
+        <button className="delete-selected" onClick={deleteSelected}>
+          삭제 ({selectedItems.length})
+        </button>
+      )}
+
       <ul>
         {items.map(item => (
           <li key={item.id}>
+            <input
+              type="checkbox"
+              checked={selectedItems.includes(item.id)}
+              onChange={() => toggleSelect(item.id)}
+            />
             {editingId === item.id ? (
               <>
                 <input
@@ -88,7 +145,6 @@ function App() {
                 {item.name} - {item.quantity}{' '}
                 <button onClick={() => startEditing(item)}>수정</button>
                 <button onClick={() => handleDelete(item.id)}>삭제</button>
-                
               </>
             )}
           </li>
@@ -97,6 +153,5 @@ function App() {
     </div>
   );
 }
-
 
 export default App;
