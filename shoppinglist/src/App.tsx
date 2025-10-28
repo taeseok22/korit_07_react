@@ -1,26 +1,40 @@
-import { Container } from '@mui/material'
-import { AppBar, Toolbar, Typography } from '@mui/material'
-import { List, ListItem, ListItemText } from '@mui/material'
-import './App.css'
-import { useState } from 'react'
-import AddItem from './AddItem';
+import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AppBar, Toolbar, Typography, Button, Container, Box, CssBaseline } from '@mui/material'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export type Item = {
-  product: string
-  amount: string
-}
+import ShoppingItemList from './components/ShoppingItemList';
+
+const QueryClient = new QueryClient();
 
 function App() {
-  const [ items, setItems ] = useState<Item[]>([]);
-  const addItem = (item: Item) => {
-    setItems([item, ...items]);
-  };
+  const [ inAuthenticated, setIsAuthenticated ] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = sessionStorage.getItem('jwt');
+      setIsAuthenticated(!!token);
+    };
+    checkAuth();  // 위에서 정의한거 바로 호출.
+    window.addEventListener('storage', checkAuth);  // 다른 탭에서의 변경을 감지하기 위해 추가.
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+    }
+  } []);
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  }
+  const handleLogout = () => {
+    sessionStorage.removeItem('jwt');
+    setIsAuthenticated(false);
+    queryClient
+  }
 
   return (
     <Container>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6">
+          <Typography variant="h6" component="div" sx={{ flexGrow : 1}} >
             쇼핑리스트 ShoppingList
           </Typography>
         </Toolbar>
